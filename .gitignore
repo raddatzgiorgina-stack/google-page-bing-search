@@ -1,0 +1,13 @@
+# 浏览器加载扩展时会生成的索引缓存
+_metadata/
+
+# 打包用的私钥：绝不入库
+*.pem
+
+# 系统/编辑器杂项
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.log

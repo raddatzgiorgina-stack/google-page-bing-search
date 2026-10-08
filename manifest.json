@@ -1,0 +1,72 @@
+{
+  "manifest_version": 3,
+  "name": "Google 主页 + 必应搜索",
+  "version": "1.0.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtPSmYmEqFi7ZlcYAYqiZZbFb8iT6lsHKHXw6nOuYBA9iCSXIcFOSX+Jbzm/g9lnPTBofRz/YhTBgrlH6yRlRSbTVIWvxLkCqbWc6w/3WibjGvhpSogqe1CmfYNVnbPefmBjYTMwivvRsngeZDd2p1HDK9sED4HGOBqeNtRg/lkJEDp4IfT6rVgBr+mwKkBTmn0Cjt+iagPTacEH15Mlly2WrE4CjjnnQ1LNlEYfD4yHdM7aehSS1Egv5bmeTiHemUUWUo85SvJKtvOeKi8tjC2jWn84iKqc+WPvaWbZTqq4maj+NPMl0L7SDrTPcq+5f2+JwVzL6bF4bS6MIHpv/TQIDAQAB",
+  "description": "保留谷歌搜索主页（新标签页/主页仍是 Google 页面），但所有搜索都用必应 (Bing) 引擎执行。",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "declarativeNetRequest"
+  ],
+  "host_permissions": [
+    "*://*.google.com/*",
+    "*://*.google.com.hk/*",
+    "*://*.google.com.tw/*",
+    "*://*.google.com.sg/*",
+    "*://*.google.co.jp/*",
+    "*://*.google.co.kr/*",
+    "*://*.google.co.uk/*",
+    "*://*.google.de/*",
+    "*://*.google.fr/*",
+    "*://*.google.ca/*",
+    "*://*.google.com.au/*",
+    "*://*.google.cn/*"
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "google_search_to_bing",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "chrome_settings_overrides": {
+    "homepage": "https://www.google.com/"
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://www.google.com/*",
+        "*://google.com/*",
+        "*://www.google.com.hk/*",
+        "*://www.google.com.tw/*",
+        "*://www.google.com.sg/*",
+        "*://www.google.co.jp/*",
+        "*://www.google.co.kr/*",
+        "*://www.google.co.uk/*",
+        "*://www.google.de/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Google 主页 + 必应搜索"
+  }
+}

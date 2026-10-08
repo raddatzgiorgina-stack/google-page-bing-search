@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "priority": 4,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "regexSubstitution": "https://www.bing.com/images/search?q=\\1"
+      }
+    },
+    "condition": {
+      "regexFilter": "^https?://(?:www\\.)?google\\.(?:com|[a-z]{2})(?:\\.[a-z]{2})?/search\\?q=([^&#]+)[^#]*tbm=isch[^#]*",
+      "resourceTypes": ["main_frame"]
+    }
+  },
+  {
+    "id": 2,
+    "priority": 3,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "regexSubstitution": "https://www.bing.com/search?q=\\1"
+      }
+    },
+    "condition": {
+      "regexFilter": "^https?://(?:www\\.)?google\\.(?:com|[a-z]{2})(?:\\.[a-z]{2})?/search\\?(?:[^#]*?&)?q=([^&#]+)[^#]*",
+      "resourceTypes": ["main_frame"]
+    }
+  }
+]

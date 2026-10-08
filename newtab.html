@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>搜索</title>
+    <link rel="stylesheet" href="newtab.css" />
+  </head>
+  <body>
+    <main class="page">
+      <div class="logo" aria-label="Google">
+        <span class="l1">G</span><span class="l2">o</span><span class="l3">o</span
+        ><span class="l4">g</span><span class="l5">l</span><span class="l6">e</span>
+      </div>
+
+      <form id="searchform" action="https://www.bing.com/search" method="GET" autocomplete="off">
+        <div class="searchbox">
+          <svg class="glass" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"
+            />
+          </svg>
+          <input
+            id="q"
+            name="q"
+            type="search"
+            placeholder="在 Bing 中搜索"
+            aria-label="搜索"
+            autofocus
+          />
+          <span class="badge" title="搜索引擎：Bing">Bing</span>
+        </div>
+
+        <div class="buttons">
+          <button type="submit">Bing 搜索</button>
+          <button type="button" id="lucky">手气不错</button>
+        </div>
+      </form>
+
+      <p class="hint">
+        页面外观保持谷歌首页风格，实际搜索引擎为 <strong>必应 (Bing)</strong>。
+      </p>
+    </main>
+
+    <script src="newtab.js"></script>
+  </body>
+</html>
