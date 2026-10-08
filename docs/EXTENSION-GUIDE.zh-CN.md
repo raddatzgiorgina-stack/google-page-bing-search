@@ -1,0 +1,158 @@
+# Google 主页 + 必应搜索（Chrome 扩展）
+
+目标：**新标签页 / 主页仍然是谷歌搜索页面，但每一次搜索都由必应 (Bing) 执行。**
+
+---
+
+## 一、先说结论（关于现成插件）
+
+在 GitHub 和公开网络上找了一圈，**没有找到完全符合这个需求的现成插件**。最接近的几个：
+
+| 项目 | 做了什么 | 是否满足需求 |
+| --- | --- | --- |
+| [StefanSokic/HotlineBing](https://github.com/StefanSokic/HotlineBing) | 把**所有** Google 域名和搜索都重定向到 bing.com，并把新标签页换成自定义页 | 否：谷歌页面被整个替换掉，而且是 Manifest V2 老规范 |
+| [harish-chary/SwapSearch](https://github.com/harish-chary/SwapSearch) | 一键在 Google / Bing / DuckDuckGo / Yahoo 之间切换当前搜索 | 否：要手动点，不是自动改写 |
+| [tranc99/chrome-search-extras](https://github.com/tranc99/chrome-search-extras) | 在谷歌搜索页上额外增加“用 Bing 搜索”的入口 | 否：只是并列入口，不替换原行为 |
+| [SandroLinux/Come-on-DuckDuckGo](https://github.com/SandroLinux/Come-on-DuckDuckGo) | 访问 Google/Bing/Yahoo 等一律跳转到 DuckDuckGo | 否：目标引擎和页面都不对 |
+
+此外还有大量反向的 “bing → google” 重定向插件，以及 `SearchBar` / `SearchPlus` / `SearchEngineSwitcher` 这类“搜索引擎轮盘”。更完整的调研清单见同目录下的 `research-findings.md`。
+
+**所以这个扩展是按你的需求新写的。**
+
+补充一句：如果你只是想让**地址栏搜索**走必应，其实 Chrome 自带设置就能做到（设置 → 搜索引擎 → 默认搜索引擎改成 Bing）。
+你还需要扩展，是因为你想要的是「页面还是谷歌页面、搜索走必应」，其中还包括**谷歌页面里那个搜索框**提交的搜索——这部分 Chrome 设置改不了。
+
+---
+
+## 二、这个扩展怎么工作
+
+核心就一条改写规则：
+
+```
+https://www.google.com/search?q=关键词        →  https://www.bing.com/search?q=关键词
+https://www.google.com/search?q=关键词&tbm=isch →  https://www.bing.com/images/search?q=关键词
+```
+
+实现上用了两层，**互为兜底**：
+
+1. **`rules.json`（declarativeNetRequest 静态规则）**：在请求真正发出**之前**就把谷歌搜索地址改写成必应地址。
+   所以不管搜索是从地址栏来的、还是从谷歌首页搜索框来的，都**不会先加载谷歌结果页再跳转**，没有闪屏，也不依赖谷歌服务器能不能连上。
+2. **`content.js`（内容脚本兜底）**：万一某次请求没被规则命中（例如访问的是没申请主机权限的冷门谷歌域名），它会在页面里拦截搜索框提交和链接点击，同样导向必应。
+
+另外还附带两个“页面感”设置：
+
+- `chrome_settings_overrides.homepage` 把浏览器**主页**设为 `https://www.google.com/`。
+- `chrome_url_overrides.newtab` 接管**新标签页**，有两种模式（见下文）。
+
+---
+
+## 三、安装方法（开发者模式加载）
+
+1. 打开 Chrome，地址栏输入 `chrome://extensions/` 回车。
+2. 打开右上角的 **「开发者模式」** 开关。
+3. 点击 **「加载已解压的扩展程序」**。
+4. 选择本文件夹 `google-homepage-bing-search`（就是包含 `manifest.json` 的那一层目录）。
+5. 安装时若 Chrome 提示“是否更改主页设置”，选择**保留**即可。
+
+Edge 同样适用：`edge://extensions/` → 开发者模式 → 加载解压缩的扩展。
+
+---
+
+## 四、设置说明
+
+点击工具栏里的扩展图标打开设置面板：
+
+| 设置项 | 说明 |
+| --- | --- |
+| **搜索转必应** | 总开关。关掉后搜索行为恢复成原生谷歌。 |
+| **新标签页 / 主页 → 真实谷歌首页** | 打开新标签页时自动跳转到 `https://www.google.com/`，即“谷歌搜索页面本身”。**（默认）** |
+| **新标签页 / 主页 → 本地仿谷歌页面** | 显示一个本地页面：界面是谷歌首页的样子（彩色 logo + 圆角搜索框），搜索直接发给必应。**无法访问 google.com 时用这个。** |
+| **测试一次搜索** | 打开 `google.com/search?q=hello+bing`，正常的话最终会落到 `bing.com/search?q=hello+bing`。 |
+
+---
+
+## 五、常见问题
+
+**1. 为什么还要单独做一个“本地仿谷歌页面”？**
+
+因为中国大陆直连 `google.com` 通常不通。默认的“真实谷歌首页”需要你能访问谷歌；如果不能，请切到“本地仿谷歌页面”，它完全不依赖谷歌服务器。
+
+**2. 我不想让扩展接管新标签页（想用 Chrome 默认新标签页）怎么办？**
+
+打开 `manifest.json`，删掉下面这段，然后在 `chrome://extensions/` 点一下该扩展的刷新按钮：
+
+```json
+"chrome_url_overrides": {
+  "newtab": "newtab.html"
+},
+```
+
+注意：`chrome_url_overrides` 只能在清单里静态声明，无法做成运行时开关，所以只能用这种方式关掉。
+
+**3. 我不想让扩展改我的主页？**
+
+同理，删掉 `manifest.json` 里的 `"chrome_settings_overrides"` 那一段。
+
+**4. 图片搜索怎么变成必应网页搜索了？**
+
+只有形如 `/search?q=xx&tbm=isch`（q 在前）的地址会被转到 `bing.com/images`，其他参数顺序会退化成必应网页搜索。遇到的话，照 `rules.json` 的格式再加一条规则即可。
+
+**5. 为什么权限申请看起来很多？**
+
+`declarativeNetRequest` 的重定向规则要求扩展对**被改写的地址**拥有主机权限，所以清单里列了十几个常见谷歌域名（google.com / .com.hk / .com.tw / .co.jp / .co.uk / .de 等）。扩展**不会读取、更不会上传任何页面内容**，所有改写都在本地完成。
+
+**6. 会不会影响我访问 Gmail、Docs？**
+
+不会。规则只匹配 `google.*/search?...`，`content.js` 也只在命中搜索页时才动作。
+
+**7. 为什么“主页”设置没生效？**
+
+官方文档写明：`chrome_settings_overrides` 里用到的域名需要开发者通过 Search Console 验证所有权，这条限制主要针对上架应用商店的扩展。
+实测（Edge 无头环境、解压加载）该字段被浏览器**忽略**，但**不影响扩展加载**，搜索改写和新标签页都照常工作。
+如果没有生效，手动设一下即可：Chrome → 设置 → 外观 → 打开“显示主页按钮”→ 自定义主页填 `https://www.google.com/`。
+
+---
+
+## 六、文件结构
+
+```
+google-homepage-bing-search/
+├── manifest.json          # MV3 清单：权限、规则集、主页/新标签页覆盖
+├── rules.json             # 核心：谷歌搜索 → 必应的重定向规则
+├── background.js          # 初始化默认设置 + 同步规则集开关
+├── content.js             # 兜底拦截（表单提交 / 链接点击）
+├── newtab.html/.css/.js   # 新标签页（真实谷歌首页 或 本地仿谷歌页面）
+├── popup.html/.css/.js    # 工具栏设置面板
+├── icons/                 # 16 / 48 / 128 图标
+└── README.md
+```
+
+---
+
+## 七、可选的“更彻底”方案
+
+如果你还希望**地址栏的搜索建议、联想词**也来自必应，可以去 Chrome 设置里把默认搜索引擎直接改成 Bing
+（设置 → 搜索引擎 → 管理搜索引擎）。配合本扩展，谷歌页面照旧保留，而搜索全程走必应。
+
+---
+
+## 八、CRX 打包与后续更新
+
+配套文件里的 `.crx` 是用 Chrome 自带打包器生成的 **CRX3** 包，签名公钥已经写进 `manifest.json` 的 `key` 字段，
+扩展 ID 固定为 **`nkbpomhadicbpikkdoeamjokkblbdaed`**。
+
+**重要前提**：Chrome 137 之后，非 Chrome 应用商店来源的 CRX 基本无法直接安装（`--load-extension` 命令行加载、
+注册表外部安装、`External Extensions` 三种方式实测都被拦截）。所以：
+
+- **本机自用** → 用「加载已解压的扩展程序」最稳（见第三节）。
+- **CRX 的用途** → 分发给别人、留档、或走企业策略 / 应用商店上架。
+
+### 改了代码之后怎么重新打包（保持同一个扩展 ID）
+
+```
+chrome.exe --pack-extension="<扩展目录>" --pack-extension-key="google-homepage-bing-search-signing-key.pem"
+```
+
+- 私钥 `google-homepage-bing-search-signing-key.pem` 一定要保管好：**同一个私钥 = 同一个扩展 ID**；私钥丢了就只能换一个新 ID，等于换了一个扩展。
+- 打包成功后会在扩展目录同级生成 `<扩展目录名>.crx`，扩展 ID 不变。
+- 打包前记得先改 `manifest.json` 里的 `version`，方便区分版本。
