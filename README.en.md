@@ -107,12 +107,14 @@ The full survey is in [docs/RESEARCH.md](docs/RESEARCH.md).
 
 **This project was written purely out of personal interest, for technical learning and exchange.**
 
+- **Not published on any store**: This Extension has **never been submitted to, nor approved by, the Chrome Web Store**. It is not a published store extension and is not distributed through any store.
+- **Usability**: Because Chrome strictly restricts extension installation sources, the Extension **may fail to install, or may not work fully after installation**, and it may partially or completely stop working due to browser updates, changes to Google's pages, or changes to Bing's endpoints. **The author accepts no responsibility for any problem encountered while using it.**
 - It is not affiliated with Google or Microsoft in any way. All trademarks and product names belong to their respective owners.
 - The extension only rewrites your own browser requests locally. It collects nothing, stores nothing, uploads nothing, and contains no analytics or tracking code.
-- Use it at your own risk. The author accepts no liability for any direct or indirect consequences of using this extension.
+- **Strictly forbidden** uses include: **any form of profiteering** (commercial sale, paid distribution, bundling into a commercial product, etc.); **attacking or harming others** (intruding into, scanning, or disrupting other people's systems, networks, accounts, or data); and any **improper or unlawful conduct** such as circumventing content filtering, fraud, harassment, or spreading unlawful information. Violators bear all consequences themselves.
 - Please comply with the laws of your jurisdiction and the terms of service of the sites you visit.
 
-See [DISCLAIMER.md](DISCLAIMER.md) for the full text.
+See [DISCLAIMER.md](DISCLAIMER.md) for the full bilingual text, including the complete review-status notice and the list of prohibited uses.
 
 ## License
 
