@@ -52,6 +52,38 @@ There is a packed `.crx` under `dist/`. Please note:
 
 > Since Chrome 137, **a CRX that does not come from the Chrome Web Store can no longer be installed directly**. I tested all three routes — command-line `--load-extension`, registry-based external install, and `External Extensions` — and all of them are blocked. The CRX is fine for distribution, archiving, or enterprise policy deployment; for local use, please use Option 1.
 
+### Option 3 — Userscript (Tampermonkey)
+
+If "developer mode + load unpacked" feels like too much hassle, use the userscript version:
+
+1. Install the [Tampermonkey](https://www.tampermonkey.net/) browser extension first (available in the Chrome Web Store);
+2. Open the link below and Tampermonkey will pop up its install page automatically:
+
+   ```
+   https://raw.githubusercontent.com/raddatzgiorgina-stack/google-page-bing-search/main/userscript/google-page-bing-search.user.js
+   ```
+
+3. Click **Install**. You can toggle this script on and off from the Tampermonkey dashboard afterwards.
+
+#### How the userscript differs from the extension (**read this before choosing**)
+
+| | Extension | Userscript |
+| --- | --- | --- |
+| When it intercepts | **Before** the request is sent (`declarativeNetRequest`) | **Right after** the page starts loading, then jumps |
+| Does the query reach Google? | **No** | **Yes** — the request has already been sent |
+| Works when Google is unreachable? | **Yes** (the rules act locally, no need to reach Google) | **No** — the script never gets a chance to run, because the page never loads |
+| Can it take over the new tab page / homepage? | Yes | **No** — built-in browser pages don't allow script injection |
+| Image search → `bing.com/images` | Yes | Yes |
+| Installation effort | Developer mode + load unpacked | One click |
+
+The reason for these differences: **Tampermonkey removed `@webRequest` / `GM_webRequest` in its Manifest V3 versions** (which is what Chrome runs today). Straight from the official docs:
+
+> *It is also not available anymore at Manifest v3 versions of Tampermonkey 5.2+ (Chrome and derivates).*
+
+Without request interception, a userscript can only "let the Google page start loading, then swap it out immediately".
+
+**Bottom line**: if you can reach Google normally and just want the easy route, the userscript is fine. If you can't reach Google, or you want the new tab page to be Google too, use the extension.
+
 ## How it works
 
 At its core this is a single declarative network rule (see `rules.json`):

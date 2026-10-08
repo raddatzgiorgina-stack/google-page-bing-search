@@ -52,6 +52,38 @@ Chrome 自带设置只能把**地址栏**和**新标签页搜索框**的搜索�
 
 > Chrome 137 之后，**非 Chrome 应用商店来源的 CRX 已无法直接安装**。命令行 `--load-extension`、注册表外部安装、`External Extensions` 三种方式我都实测被拦截。CRX 更适合分发、留档或企业策略部署，本机自用请走方式一。
 
+### 方式三：油猴脚本（Tampermonkey）
+
+如果觉得"开发者模式加载解压"太麻烦，可以用油猴版：
+
+1. 先装 [Tampermonkey](https://www.tampermonkey.net/) 浏览器扩展（Chrome 应用商店可直接搜到）；
+2. 打开下面这个链接，Tampermonkey 会自动弹出安装页面：
+
+   ```
+   https://raw.githubusercontent.com/raddatzgiorgina-stack/google-page-bing-search/main/userscript/google-page-bing-search.user.js
+   ```
+
+3. 点「安装」即可。之后可以在 Tampermonkey 的面板里单独开关这个脚本。
+
+#### 油猴版和扩展版的差别（**很重要，请先看完再选**）
+
+| | 扩展版 | 油猴版 |
+| --- | --- | --- |
+| 拦截时机 | 请求**发出前**（`declarativeNetRequest`） | 页面开始加载后**立刻跳转** |
+| 会不会把查询发给谷歌 | **不会** | **会**（请求已经发出去了） |
+| 谷歌打不开时还能用吗 | **能**（规则在本地生效，够不到谷歌也不影响） | **不能**（脚本没机会运行，因为页面根本没加载出来） |
+| 能否接管新标签页 / 主页 | 能 | **不能**（浏览器内置页面不允许脚本注入） |
+| 图片搜索转 `bing.com/images` | 能 | 能 |
+| 安装难度 | 要开开发者模式、加载解压目录 | 点一下安装 |
+
+之所以有这些差别，是因为 **Tampermonkey 在 Manifest V3 版本（目前 Chrome 上就是它）已经移除了 `@webRequest` / `GM_webRequest`**，官方文档的原话是：
+
+> *It is also not available anymore at Manifest v3 versions of Tampermonkey 5.2+ (Chrome and derivates).*
+
+没有请求拦截能力，油猴脚本就只能"先让谷歌页面开始加载，再马上把它换掉"。
+
+**结论**：能正常访问谷歌、只想省事 → 油猴版够用；打不开谷歌、或者希望新标签页也是谷歌页面 → 还是用扩展版。
+
 ## 工作原理
 
 核心是一条声明式网络请求规则（见 `rules.json`）：
